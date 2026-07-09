@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: alsayed-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: alsayed
+      POSTGRES_USER: alsayed
+      POSTGRES_PASSWORD: alsayed_dev_password
+    volumes:
+      - alsayed_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alsayed -d alsayed"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  alsayed_postgres_data:

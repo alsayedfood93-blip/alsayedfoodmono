@@ -1,0 +1,49 @@
+# Dependencies
+node_modules
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+.next
+dist
+build
+out
+coverage
+
+# Turbo
+.turbo
+
+# Prisma
+packages/database/prisma/*.db
+packages/database/prisma/*.db-journal
+
+# Uploads (future)
+uploads
+apps/api/uploads
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Testing
+*.tsbuildinfo
+
+# Misc
+*.pem
+.cache

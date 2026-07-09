@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Minimal connectivity model for foundation verification only.
+/// Business schema will be designed in a later phase.
+model SystemHealth {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+}

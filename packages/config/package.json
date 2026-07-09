@@ -1,0 +1,13 @@
+{
+  "name": "@alsayed/config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.nextjs.json": "./tsconfig.nextjs.json",
+    "./tsconfig.nestjs.json": "./tsconfig.nestjs.json"
+  },
+  "files": [
+    "tsconfig*.json"
+  ]
+}
