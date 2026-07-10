@@ -56,7 +56,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div className="flex h-16 items-center gap-2.5 border-b border-ink/10 px-5">
-          <DropletMark className="h-7 w-7 text-brand-600" />
+          <DropletMark className="h-10 w-10" />
           <div className="leading-none">
             <p className="text-base font-bold tracking-tight text-ink">
               ALSAYED

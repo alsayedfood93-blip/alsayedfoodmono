@@ -45,7 +45,7 @@ export function Footer({
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:grid-cols-6">
           <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2.5">
-              <DropletMark className="h-8 w-8 text-brand-600" />
+              <DropletMark className="h-12 w-12" />
               <span className="leading-none">
                 <span className="block font-serif text-xl font-bold tracking-tight text-ink">
                   ALSAYED

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type IconProps = { className?: string };
 
 export function GridIcon({ className = "" }: IconProps) {
@@ -73,8 +75,14 @@ export function PlusIcon({ className = "" }: IconProps) {
 }
 export function DropletMark({ className = "" }: IconProps) {
   return (
-    <svg viewBox="0 0 32 32" className={className} fill="none" aria-hidden="true">
-      <path d="M16 2C16 2 6 13.5 6 20.5C6 26 10.5 30 16 30C21.5 30 26 26 26 20.5C26 13.5 16 2 16 2Z" fill="currentColor" />
-    </svg>
+    <Image
+      src="/brand_logo.png"
+      alt=""
+      width={128}
+      height={128}
+      className={className}
+      aria-hidden="true"
+      unoptimized
+    />
   );
 }

@@ -49,7 +49,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-50 to-[#f4f6f4] px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <DropletMark className="h-11 w-11 text-brand-600" />
+          <DropletMark className="h-16 w-16" />
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-ink">
             ALSAYED Admin
           </h1>
