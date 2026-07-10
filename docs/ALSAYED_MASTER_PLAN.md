@@ -1427,6 +1427,18 @@ Completion criteria:
 
 **Verified:** production build succeeds; during static generation (API offline) the explicit dev-fallback path triggered and logged as designed.
 
+**Phase 10 visual-runtime bug --- customer homepage served 404 (RESOLVED):**
+
+-   **Symptom:** With the full local stack healthy (Postgres up, NestJS on `:3002`, all API routes mapped, API endpoints returning `200`), `apps/web` on `http://localhost:3000` served the custom Next.js `not-found.tsx` ("Page not found") for the homepage and, in fact, for **every** App Router route (`/`, `/products`, ...). The shared `Navbar`/`Footer` from `layout.tsx` rendered correctly around the 404 body, and the layout's own API fetches returned real data (real WhatsApp/phone number, real categories), so this looked like a homepage-specific data/`notFound()` failure.
+-   **Investigation (evidence-based, no guessing):**
+    -   `apps/web/src/app/page.tsx` and `apps/web/src/lib/api.ts` were audited: the homepage **never** calls `notFound()`, and every homepage fetch is wrapped in `withFallback(...)`, so an API/network failure yields explicit fallback data + a `DevFallbackBanner`, not a 404. `notFound()` exists **only** in the genuine resource-detail routes `products/[slug]/page.tsx` and `categories/[slug]/page.tsx`, which is correct.
+    -   Direct API probes: `GET :3002/api/content/hero` and `GET :3002/api/categories` → `200`. No `[ALSAYED][dev-fallback]` warnings appeared in the dev log, confirming the API layer was healthy and data was loading.
+    -   `GET :3000/` **and** `GET :3000/products` both returned `404` even though `/products` never calls `notFound()`, and `.next/server/app-paths-manifest.json` correctly registered `/page`, `/products/page`, etc. `.next` also contained a full prior **production** build (`BUILD_ID`, `export-marker.json`, `prerender-manifest.json`) in which `/` had been prerendered as a normal `200` route.
+    -   Root-cause confirmation: forcing a fresh Turbopack recompile of `page.tsx` (a trivial no-op source edit) immediately flipped `/` from `404` → `200`, and subsequent requests recompiled `/products` → `200`. **No route logic, data-fetching, config, or environment value was changed.**
+-   **Root cause:** a **stale/corrupted `.next` Turbopack dev cache**. A prior `next build` (production) had populated `.next` in the same directory used by `next dev --turbopack`; the poisoned persistent cache caused the dev server to resolve every App Router route to the `_not-found` boundary (layout still rendered, so the body showed the 404). This was **not** an ALSAYED code, API, route-semantics, or configuration defect --- the homepage and its data layer were already correct.
+-   **Fix:** invalidate the corrupted build cache / recompile from source (durable remedy: `pnpm --filter @alsayed/web clean` --- i.e. `rimraf .next` --- before `pnpm dev` whenever a production `next build` has previously run against the same `.next`). No source or `notFound()` changes were required or made; `notFound()` remains reserved for real unknown product/category slugs.
+-   **Re-verified (live):** `GET :3000/` → `200` rendering the approved landing page (hero "Every sip / carries meaning", Explore Products, Who We Are, Featured, Heritage, CEO, Contact, plus `id="categories"` and `id="contact"` anchors, so `/#contact` stays on the homepage and reaches the contact section); homepage public API data loads without fallback; `GET :3000/products/<unknown-slug>` → `404` and `GET :3000/categories/<unknown-slug>` → `404` (genuine detail-route `notFound()` preserved); `pnpm lint` and `pnpm typecheck` pass.
+
 ------------------------------------------------------------------------
 
 ### Phase 11 --- Modern Admin Dashboard UI
