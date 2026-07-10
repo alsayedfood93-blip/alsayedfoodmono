@@ -29,9 +29,14 @@ describe('HealthController (e2e)', () => {
   });
 
   it('/api/health (GET)', () => {
-    return request(app.getHttpServer()).get('/api/health').expect(200).expect({
-      status: 'ok',
-      service: 'alsayed-api',
-    });
+    return request(app.getHttpServer())
+      .get('/api/health')
+      .expect(200)
+      .expect((res) => {
+        const body = res.body as { status?: string; service?: string };
+        if (body.status !== 'ok' || body.service !== 'alsayed-api') {
+          throw new Error('Unexpected health response');
+        }
+      });
   });
 });

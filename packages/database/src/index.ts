@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -17,6 +17,14 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
-export { PrismaClient };
-export type { Prisma } from "@prisma/client";
+export { PrismaClient, Prisma };
+export type {
+  Admin,
+  AdminSession,
+  Category,
+  Product,
+  CeoMessage,
+  HeroContent,
+  SiteSettings,
+} from "@prisma/client";
 export default prisma;

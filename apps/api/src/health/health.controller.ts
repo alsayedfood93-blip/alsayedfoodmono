@@ -20,7 +20,7 @@ export class HealthController {
       },
     },
   })
-  getHealth(): HealthResponse {
+  getHealth(): Promise<HealthResponse> {
     return this.healthService.getHealth();
   }
 }

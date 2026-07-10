@@ -1112,7 +1112,9 @@ Completion criteria:
 -   Workspace dependencies resolve
 -   Turbo recognizes the workspace
 
-**Status:** IN PROGRESS / VERIFY CURRENT REPOSITORY
+**Status:** COMPLETE
+
+**Verified:** All 6 workspace packages resolve; PostgreSQL 16 container healthy; Prisma client generates; `pnpm lint`, `pnpm typecheck`, `pnpm build` all pass via Turbo.
 
 ------------------------------------------------------------------------
 
@@ -1145,7 +1147,11 @@ Completion criteria:
 -   Database constraints match this master plan
 -   No legacy typo naming is repeated
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `packages/database/prisma/schema.prisma` defines `Admin`, `AdminSession`, `Category`, `Product`, `CeoMessage`, `HeroContent`, `SiteSettings`. Integer price semantics, `ingredients String[]`, relative `imagePath`, unique slugs, `Category hasMany Product` with `onDelete: Restrict` (no destructive cascade), `ceoMessage` correctly named (legacy typo not reproduced). `SystemHealth` removed via migration. Two migrations applied; schema up to date. Dev seed (`prisma/seed.ts`) creates one bcrypt admin (`admin` / `Admin123!`, DEV ONLY), 4 categories, 6 products, hero, CEO, site settings — all clearly labelled development data.
+
+**Verified:** `prisma migrate status` → "Database schema is up to date!" (2 migrations); Prisma client generates; relationships confirmed via live API (`productCount` per category, product→category summary).
 
 ------------------------------------------------------------------------
 
@@ -1171,7 +1177,11 @@ Completion criteria:
 -   Prisma connection works
 -   API build succeeds
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `PrismaModule`/`PrismaService` (global, lifecycle hooks), `ConfigModule` with `env.validation.ts`, global `ValidationPipe` (`whitelist`, `transform`, `forbidNonWhitelisted`), env-based CORS for `localhost:3000/3001`, Swagger at `/api/docs` with bearer auth, `AllExceptionsFilter` mapping Prisma errors to production-safe responses (no stack traces / raw Prisma leakage).
+
+**Verified:** `GET /api/health` → `{"status":"ok","service":"alsayed-api","database":"up"}`; all routes mapped on boot; API build succeeds.
 
 ------------------------------------------------------------------------
 
@@ -1199,7 +1209,11 @@ Completion criteria:
 -   Logout/session behavior is verified
 -   Legacy bcrypt compatibility has a test path
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `POST /api/auth/admin/login|refresh|logout`, `GET /api/auth/admin/me`. Short-lived JWT access token (900s) + opaque refresh credential; only a hashed refresh representation is stored in `AdminSession` (raw refresh never persisted). Refresh rotates the session; logout revokes it. `JwtAuthGuard` + `@CurrentAdmin` decorator protect routes. bcrypt (`bcryptjs`) used for password verification — hash format is standard bcrypt, so legacy Laravel hashes can be copied without forced resets.
+
+**Verified (live):** valid login OK; `me` with token OK; `me` without token → 401; refresh OK; **reused (rotated-out) refresh → 401**; logout → `{success:true}`; **refresh after logout → 401**.
 
 ------------------------------------------------------------------------
 
@@ -1228,7 +1242,13 @@ Completion criteria:
 -   Replaced image cleanup works
 -   Storage persistence requirements are documented
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `StorageService` + `ImageUploadInterceptor` (Multer memory storage, MIME + size validation, collision-resistant UUID filenames, path-traversal protection). Domain directories under `apps/api/uploads/{products,categories,ceo,hero,branding,legacy}`. DB stores **relative** paths (`/uploads/<domain>/<file>`); static serving mounted at `/uploads`. Replacement deletes the previous file; deletion removes the file. Upload root is env-configurable (`UPLOAD_ROOT`) for a Hostinger persistent disk / bind mount in production.
+
+**Persistence requirement (documented):** uploads MUST survive NestJS restart, application rebuild, and container replacement — production must use a persistent Hostinger directory / bind mount / volume; ephemeral container-only storage is unacceptable.
+
+**Verified (live):** category image uploaded → stored as `/uploads/categories/categories-<uuid>.png`; `GET http://localhost:3002/uploads/...` → `200 image/png`; after category delete the image → `404` (cleanup confirmed).
 
 ------------------------------------------------------------------------
 
@@ -1259,7 +1279,11 @@ Completion criteria:
 -   Category with products cannot be accidentally deleted
 -   Build/type verification passes
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `CategoriesModule` / `CategoriesService`. Public: `GET /api/categories`, `/api/categories/:slug`, `/api/categories/:slug/products`. Admin (JWT): `POST/PATCH/DELETE /api/admin/categories`. Unique slug generation, active filtering, deterministic sort, image upload/replacement, relative paths. Populated-category delete returns HTTP 409. Shared `CategoryDto` type.
+
+**Verified (live):** public list returns active categories with `productCount`; create-with-image OK; delete empty category OK; **delete of populated category id=1 → 409 Conflict**.
 
 ------------------------------------------------------------------------
 
@@ -1295,7 +1319,11 @@ Completion criteria:
 -   Filters work
 -   Category relationship is validated
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `ProductsModule` / `ProductsService`. Public: `GET /api/products` (filters: `category`, `featured`, `search`), `GET /api/products/:slug`, `GET /api/categories/:slug/products`. Admin (JWT): `POST/PATCH/DELETE /api/admin/products`. Unique/stable slugs, category-existence validation, image upload/replacement (relative paths), `ingredients String[]`, integer price, active/featured filtering, deterministic sort. No cart/checkout/orders (catalog only, per plan). Shared `ProductDto`.
+
+**Verified (live):** `GET /api/products?featured=true` returns 4 featured products each with embedded category summary; product detail by slug works.
 
 ------------------------------------------------------------------------
 
@@ -1320,7 +1348,11 @@ Completion criteria:
 -   CEO image replacement works
 -   Site contact/social information is dynamic
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `ContentModule` (singleton `HeroContent` + `CeoMessage` upsert logic) and `SiteSettingsModule`. Public: `GET /api/content/hero`, `/api/content/ceo`, `/api/site-settings`. Admin (JWT): `PATCH /api/admin/content/hero`, `/api/admin/content/ceo` (CEO image upload/replacement), `PATCH /api/admin/site-settings` (logo/branding upload/replacement). Email + URL validation; empty multipart strings coerced to `undefined`. No invented metrics/certifications/statistics. Shared DTOs.
+
+**Verified (live):** `GET /api/site-settings` returns full dynamic company/contact/social record; hero + CEO endpoints serve managed content.
 
 ------------------------------------------------------------------------
 
@@ -1357,7 +1389,11 @@ Completion criteria:
 -   Animations are restrained
 -   Production build succeeds
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `apps/web` (Next.js 16, App Router, Tailwind v4). All required sections built as components: Navbar, premium Hero, Trust strip, Categories, Featured products, Who We Are, CEO, Palestinian heritage/brand story, WhatsApp/contact CTA, premium Footer. Custom design system (warm/clean white, ALSAYED green, editorial display heading via Playfair Display, soft borders, restrained shadows) derived from the client-approved `design-references/Desktop-ui.PNG` and `Mobile-ui.PNG`. Bottle placeholder component allows real transparent PNG product assets to drop in without layout redesign.
+
+**Status note on visual verification:** production build succeeds and static/dynamic routes render. Pixel-level browser/screenshot comparison against the reference images was **not** performed in this session (no browser-automation tooling was invoked), so a formal visual-parity claim is not made.
 
 ------------------------------------------------------------------------
 
@@ -1385,7 +1421,11 @@ Completion criteria:
 -   API failures have graceful UI behavior
 -   Product/category URLs are slug-based
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** Server-side data fetching (`apps/web/src/lib/api.ts`) for SEO; slug routes `/products`, `/products/[slug]`, `/categories/[slug]`; per-page metadata; `resolveImageUrl` for API-hosted images; ISR (`revalidate 30s` on home). API failures fall back to **explicit** development data with a visible `DevFallbackBanner` and a `[ALSAYED][dev-fallback]` server log — never silent mock business data. Redux is intentionally NOT used on the public site.
+
+**Verified:** production build succeeds; during static generation (API offline) the explicit dev-fallback path triggered and logged as designed.
 
 ------------------------------------------------------------------------
 
@@ -1415,7 +1455,11 @@ Completion criteria:
 -   UI is consistent with ALSAYED branding
 -   Responsive admin behavior works
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** `apps/admin-web` (Next.js 16). Pages: Login, Dashboard, Categories, Products, Hero Content, CEO Message, Site Settings, plus profile/logout in the shell. `AdminShell` sidebar/topbar layout, ALSAYED white/green branding (distinct from customer site), reusable UI kit (Button/Field/Input/Textarea/Select/Card/Toggle/Badge), professional tables, image-preview upload field, toast notifications, confirm dialog. Forms mirror the actual API DTOs (no unsupported fields).
+
+**Verified:** admin production build succeeds; all 8 routes prerendered.
 
 ------------------------------------------------------------------------
 
@@ -1445,7 +1489,11 @@ Completion criteria:
 -   Expired auth behavior is correct
 -   CRUD changes appear on the customer website
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+**Implementation:** Redux Toolkit + RTK Query (`apps/admin-web/src/store`). `authSlice` holds access token in memory; refresh token persisted (localStorage) for session restoration via `AuthBootstrap`. `baseQueryWithReauth` transparently refreshes on 401 and retries; logout revokes the refresh session server-side. `AuthGuard` protects the `(admin)` route group. RTK Query endpoints cover dashboard summary, category CRUD + image, product CRUD + image, hero, CEO + image, site settings + logo, using `multipart/form-data` for uploads. Loading/success/error/DTO-validation/empty/conflict feedback wired via toasts and dialogs.
+
+**Verified:** admin build succeeds; underlying API flows (auth restore, refresh rotation, CRUD, image upload, delete-conflict) confirmed live against the running API (see Phase 04/05/06 verifications). Manual click-through of the admin UI in a browser was not automated this session.
 
 ------------------------------------------------------------------------
 
@@ -1724,9 +1772,49 @@ implementation.
 ### Current phase
 
 ``` text
-Phase 01 — Monorepo Foundation
-Status: IN PROGRESS / VERIFY CURRENT REPOSITORY
+Local system build (Phases 01–12): COMPLETE
+Next authorized phase: Phase 13 — Legacy MySQL Data Migration (NOT started; requires owner approval)
 ```
+
+### Local build status (overnight autonomous session)
+
+``` text
+Phase 01  Monorepo Foundation ............... COMPLETE
+Phase 02  PostgreSQL Business Schema ......... COMPLETE
+Phase 03  NestJS Core Foundation ............. COMPLETE
+Phase 04  Admin Authentication ............... COMPLETE
+Phase 05  Backend Image Storage .............. COMPLETE
+Phase 06  Categories Vertical Slice .......... COMPLETE
+Phase 07  Products Vertical Slice ............ COMPLETE
+Phase 08  Website Content Management ......... COMPLETE
+Phase 09  Customer Website Static UI ......... COMPLETE (build verified; no automated visual diff)
+Phase 10  Customer Website API Integration ... COMPLETE
+Phase 11  Admin Dashboard UI ................. COMPLETE
+Phase 12  Admin API Integration .............. COMPLETE
+Phase 13–20 ................................... PENDING (NOT authorized this session)
+```
+
+### Full-system verification results
+
+``` text
+pnpm lint ......... PASS (all 6 packages)
+pnpm typecheck .... PASS (all packages)
+pnpm build ........ PASS (@alsayed/web, @alsayed/admin-web, @alsayed/api + shared packages)
+PostgreSQL ........ Up (healthy), container alsayed-postgres
+Prisma migrate .... "Database schema is up to date!" (2 migrations)
+API health ........ {"status":"ok","service":"alsayed-api","database":"up"}
+Auth flow ......... login / me / guard-401 / refresh / rotation-reject / logout / post-logout-reject ALL PASS
+Image storage ..... upload -> relative path -> static 200 image/png -> delete -> 404 cleanup ALL PASS
+Delete safety ..... populated category delete -> 409 Conflict
+Dashboard summary . {categories:4, products:6, active:6, featured:4} (real data, authed)
+```
+
+### Not verified this session (tooling boundary)
+
+- Automated browser/screenshot visual diff of the customer site against
+  `design-references/Desktop-ui.PNG` / `Mobile-ui.PNG`.
+- Manual click-through of the admin dashboard UI in a live browser
+  (underlying APIs were verified directly instead).
 
 ### Known completed preparation
 
@@ -1746,15 +1834,20 @@ Status: IN PROGRESS / VERIFY CURRENT REPOSITORY
 
 ### Immediate next action
 
-Verify the actual Phase 01 monorepo implementation against this master
-plan.
+The complete LOCAL system (Phases 01–12) is implemented and verified.
+Phases 13–20 (legacy data/image migration, staging, production cutover)
+require explicit owner approval and production credentials and are
+intentionally NOT started.
 
-If Phase 01 passes all completion criteria:
+Recommended first action tomorrow:
 
 ``` text
-Mark Phase 01 COMPLETE
-        ↓
-Start Phase 02 — PostgreSQL Production Schema
+1. Run the local stack (docker compose up -d + pnpm dev) and manually
+   review the customer site (desktop + mobile) and admin dashboard in a
+   browser against design-references/Desktop-ui.PNG and Mobile-ui.PNG.
+2. Capture any visual refinements as small follow-up tasks.
+3. Only after sign-off, plan Phase 13 (legacy MySQL export -> transform ->
+   PostgreSQL) in a read-only, non-destructive manner.
 ```
 
 ------------------------------------------------------------------------

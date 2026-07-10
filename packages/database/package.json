@@ -17,16 +17,24 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "deploy": "prisma migrate deploy",
+    "reset": "prisma migrate reset --force",
+    "seed": "tsx prisma/seed.ts",
     "studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1"
   },
   "devDependencies": {
     "@alsayed/config": "workspace:*",
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20",
+    "bcryptjs": "^3.0.3",
     "prisma": "^6.11.1",
     "rimraf": "^6.0.1",
+    "tsx": "^4.23.0",
     "typescript": "^5.8.3"
   }
 }

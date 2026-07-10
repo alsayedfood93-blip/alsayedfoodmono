@@ -1,33 +1,63 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/site/navbar";
+import { Footer } from "@/components/site/footer";
+import { getCategories, getSiteSettings } from "@/lib/api";
+import { whatsappLink } from "@/lib/whatsapp";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "ALSAYED Food & Beverages",
-  description: "ALSAYED Food & Beverages customer website",
+  metadataBase: new URL("https://alsayedfood.com"),
+  title: {
+    default: "ALSAYED Food & Beverages — Every sip carries meaning",
+    template: "%s | ALSAYED Food & Beverages",
+  },
+  description:
+    "Premium beverages crafted with care, delivered with purpose. Explore ALSAYED mineral water, fizzy drinks, energy drinks and cola.",
+  openGraph: {
+    title: "ALSAYED Food & Beverages",
+    description:
+      "Premium beverages crafted with care, delivered with purpose.",
+    type: "website",
+  },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [settings, categories] = await Promise.all([
+    getSiteSettings(),
+    getCategories(),
+  ]);
+  const orderLink =
+    whatsappLink(
+      settings.whatsapp ?? settings.phone,
+      "Hi ALSAYED, I would like to place an order.",
+    ) ?? "/#contact";
+
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-cream text-ink">
+        <Navbar orderLink={orderLink} />
+        <div className="flex-1">{children}</div>
+        <Footer settings={settings} categories={categories} />
+      </body>
     </html>
   );
 }
