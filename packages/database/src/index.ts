@@ -25,6 +25,7 @@ export type {
   Product,
   CeoMessage,
   HeroContent,
+  HeroImage,
   SiteSettings,
 } from "@prisma/client";
 export default prisma;

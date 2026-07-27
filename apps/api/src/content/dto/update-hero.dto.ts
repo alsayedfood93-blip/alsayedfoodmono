@@ -1,6 +1,41 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { ToBoolean } from '../../common/transforms';
+
+function parseIdList(value: unknown): number[] | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => Number(item)).filter((n) => Number.isFinite(n));
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    try {
+      const parsed: unknown = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item) => Number(item))
+          .filter((n) => Number.isFinite(n));
+      }
+    } catch {
+      // Fall through to comma-separated parsing.
+    }
+    return trimmed
+      .split(',')
+      .map((part) => Number(part.trim()))
+      .filter((n) => Number.isFinite(n));
+  }
+  return undefined;
+}
 
 export class UpdateHeroDto {
   @ApiPropertyOptional()
@@ -55,4 +90,20 @@ export class UpdateHeroDto {
   @IsOptional()
   @ToBoolean()
   isActive?: boolean;
+
+  /** Existing background image ids to remove (JSON array or comma-separated). */
+  @ApiPropertyOptional({ type: [Number] })
+  @IsOptional()
+  @Transform(({ value }) => parseIdList(value))
+  @IsArray()
+  @IsInt({ each: true })
+  deleteImageIds?: number[];
+
+  /** Desired order of remaining existing image ids (JSON array or comma-separated). */
+  @ApiPropertyOptional({ type: [Number] })
+  @IsOptional()
+  @Transform(({ value }) => parseIdList(value))
+  @IsArray()
+  @IsInt({ each: true })
+  imageOrder?: number[];
 }

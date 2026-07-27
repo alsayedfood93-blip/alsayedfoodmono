@@ -15,7 +15,7 @@ export default async function HomePage() {
   return (
     <>
       <DevFallbackBanner show={data.usedFallback} />
-      <Hero hero={data.hero} products={data.featuredProducts} />
+      <Hero hero={data.hero} />
       <TrustStrip />
       <CategoriesSection categories={data.categories} />
       <FeaturedProducts products={data.featuredProducts} />

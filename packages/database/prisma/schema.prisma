@@ -114,7 +114,24 @@ model HeroContent {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
+  images HeroImage[]
+
   @@map("hero_content")
+}
+
+/// Background slides for the homepage hero. Ordered by sortOrder ascending.
+model HeroImage {
+  id        Int      @id @default(autoincrement())
+  heroId    Int
+  imagePath String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hero HeroContent @relation(fields: [heroId], references: [id], onDelete: Cascade)
+
+  @@index([heroId, sortOrder])
+  @@map("hero_images")
 }
 
 model SiteSettings {

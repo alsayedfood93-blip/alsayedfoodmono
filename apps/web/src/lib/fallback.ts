@@ -26,6 +26,7 @@ export const FALLBACK_HERO: HeroContentDto = {
   secondaryButtonText: "View Categories",
   secondaryButtonLink: "/#categories",
   isActive: true,
+  images: [],
   createdAt: now,
   updatedAt: now,
 };

@@ -1,3 +1,10 @@
+export interface HeroImageDto {
+  id: number;
+  imagePath: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
 export interface HeroContentDto {
   id: number;
   eyebrow: string | null;
@@ -9,6 +16,8 @@ export interface HeroContentDto {
   secondaryButtonText: string | null;
   secondaryButtonLink: string | null;
   isActive: boolean;
+  /** Background slides ordered by sortOrder ascending. */
+  images: HeroImageDto[];
   createdAt: string;
   updatedAt: string;
 }

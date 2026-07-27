@@ -1,10 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import type { CeoMessageDto, HeroContentDto } from '@alsayed/shared-types';
-import type { CeoMessage, HeroContent } from '@alsayed/database';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import type {
+  CeoMessageDto,
+  HeroContentDto,
+  HeroImageDto,
+} from '@alsayed/shared-types';
+import type { CeoMessage, HeroContent, HeroImage } from '@alsayed/database';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { UpdateCeoDto } from './dto/update-ceo.dto';
+
+type HeroWithImages = HeroContent & { images: HeroImage[] };
 
 @Injectable()
 export class ContentService {
@@ -14,67 +24,82 @@ export class ContentService {
   ) {}
 
   async getHero(): Promise<HeroContentDto | null> {
-    const hero = await this.prisma.heroContent.findFirst({
-      orderBy: { id: 'asc' },
-    });
+    const hero = await this.findHeroWithImages();
     return hero ? this.serializeHero(hero) : null;
   }
 
-  async updateHero(dto: UpdateHeroDto): Promise<HeroContentDto> {
-    const existing = await this.prisma.heroContent.findFirst({
-      orderBy: { id: 'asc' },
-    });
+  async updateHero(
+    dto: UpdateHeroDto,
+    files: Express.Multer.File[] = [],
+  ): Promise<HeroContentDto> {
+    const hero = await this.ensureHero(dto);
 
-    if (!existing) {
-      const created = await this.prisma.heroContent.create({
-        data: {
-          eyebrow: dto.eyebrow ?? null,
-          title: dto.title ?? 'ALSAYED',
-          highlightedText: dto.highlightedText ?? null,
-          description: dto.description ?? null,
-          primaryButtonText: dto.primaryButtonText ?? null,
-          primaryButtonLink: dto.primaryButtonLink ?? null,
-          secondaryButtonText: dto.secondaryButtonText ?? null,
-          secondaryButtonLink: dto.secondaryButtonLink ?? null,
-          isActive: dto.isActive ?? true,
-        },
-      });
-      return this.serializeHero(created);
+    if (dto.deleteImageIds?.length) {
+      await this.deleteHeroImagesByIds(hero.id, dto.deleteImageIds);
     }
 
-    const updated = await this.prisma.heroContent.update({
-      where: { id: existing.id },
-      data: {
-        eyebrow: dto.eyebrow === undefined ? existing.eyebrow : dto.eyebrow,
-        title: dto.title ?? existing.title,
-        highlightedText:
-          dto.highlightedText === undefined
-            ? existing.highlightedText
-            : dto.highlightedText,
-        description:
-          dto.description === undefined
-            ? existing.description
-            : dto.description,
-        primaryButtonText:
-          dto.primaryButtonText === undefined
-            ? existing.primaryButtonText
-            : dto.primaryButtonText,
-        primaryButtonLink:
-          dto.primaryButtonLink === undefined
-            ? existing.primaryButtonLink
-            : dto.primaryButtonLink,
-        secondaryButtonText:
-          dto.secondaryButtonText === undefined
-            ? existing.secondaryButtonText
-            : dto.secondaryButtonText,
-        secondaryButtonLink:
-          dto.secondaryButtonLink === undefined
-            ? existing.secondaryButtonLink
-            : dto.secondaryButtonLink,
-        isActive: dto.isActive ?? existing.isActive,
-      },
-    });
-    return this.serializeHero(updated);
+    // Reorder remaining images before appending uploads so imageOrder only
+    // needs to reference ids that already exist on the client.
+    if (dto.imageOrder?.length) {
+      await this.applyImageOrder(hero.id, dto.imageOrder);
+    }
+
+    if (files.length > 0) {
+      await this.appendHeroImages(hero.id, files);
+    }
+
+    const refreshed = await this.findHeroWithImages();
+    if (!refreshed) {
+      throw new NotFoundException('Hero content was not found after update.');
+    }
+    return this.serializeHero(refreshed);
+  }
+
+  async addHeroImages(files: Express.Multer.File[]): Promise<HeroContentDto> {
+    if (!files?.length) {
+      throw new BadRequestException('At least one image file is required.');
+    }
+    const hero = await this.ensureHero({});
+    await this.appendHeroImages(hero.id, files);
+    const refreshed = await this.findHeroWithImages();
+    if (!refreshed) {
+      throw new NotFoundException('Hero content was not found after upload.');
+    }
+    return this.serializeHero(refreshed);
+  }
+
+  async deleteHeroImage(imageId: number): Promise<HeroContentDto> {
+    const hero = await this.findHeroWithImages();
+    if (!hero) {
+      throw new NotFoundException('Hero content was not found.');
+    }
+
+    const image = hero.images.find((item) => item.id === imageId);
+    if (!image) {
+      throw new NotFoundException(`Hero image ${imageId} was not found.`);
+    }
+
+    await this.prisma.heroImage.delete({ where: { id: imageId } });
+    await this.storage.deleteByPublicPath(image.imagePath);
+
+    const refreshed = await this.findHeroWithImages();
+    if (!refreshed) {
+      throw new NotFoundException('Hero content was not found after delete.');
+    }
+    return this.serializeHero(refreshed);
+  }
+
+  async reorderHeroImages(orderedIds: number[]): Promise<HeroContentDto> {
+    const hero = await this.findHeroWithImages();
+    if (!hero) {
+      throw new NotFoundException('Hero content was not found.');
+    }
+    await this.applyImageOrder(hero.id, orderedIds);
+    const refreshed = await this.findHeroWithImages();
+    if (!refreshed) {
+      throw new NotFoundException('Hero content was not found after reorder.');
+    }
+    return this.serializeHero(refreshed);
   }
 
   async getCeo(): Promise<CeoMessageDto | null> {
@@ -130,7 +155,147 @@ export class ContentService {
     return this.serializeCeo(updated);
   }
 
-  private serializeHero(hero: HeroContent): HeroContentDto {
+  private async findHeroWithImages(): Promise<HeroWithImages | null> {
+    return this.prisma.heroContent.findFirst({
+      orderBy: { id: 'asc' },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+      },
+    });
+  }
+
+  private async ensureHero(dto: UpdateHeroDto): Promise<HeroWithImages> {
+    const existing = await this.findHeroWithImages();
+    if (existing) {
+      const updated = await this.prisma.heroContent.update({
+        where: { id: existing.id },
+        data: {
+          eyebrow: dto.eyebrow === undefined ? existing.eyebrow : dto.eyebrow,
+          title: dto.title ?? existing.title,
+          highlightedText:
+            dto.highlightedText === undefined
+              ? existing.highlightedText
+              : dto.highlightedText,
+          description:
+            dto.description === undefined
+              ? existing.description
+              : dto.description,
+          primaryButtonText:
+            dto.primaryButtonText === undefined
+              ? existing.primaryButtonText
+              : dto.primaryButtonText,
+          primaryButtonLink:
+            dto.primaryButtonLink === undefined
+              ? existing.primaryButtonLink
+              : dto.primaryButtonLink,
+          secondaryButtonText:
+            dto.secondaryButtonText === undefined
+              ? existing.secondaryButtonText
+              : dto.secondaryButtonText,
+          secondaryButtonLink:
+            dto.secondaryButtonLink === undefined
+              ? existing.secondaryButtonLink
+              : dto.secondaryButtonLink,
+          isActive: dto.isActive ?? existing.isActive,
+        },
+        include: {
+          images: { orderBy: { sortOrder: 'asc' } },
+        },
+      });
+      return updated;
+    }
+
+    return this.prisma.heroContent.create({
+      data: {
+        eyebrow: dto.eyebrow ?? null,
+        title: dto.title ?? 'ALSAYED',
+        highlightedText: dto.highlightedText ?? null,
+        description: dto.description ?? null,
+        primaryButtonText: dto.primaryButtonText ?? null,
+        primaryButtonLink: dto.primaryButtonLink ?? null,
+        secondaryButtonText: dto.secondaryButtonText ?? null,
+        secondaryButtonLink: dto.secondaryButtonLink ?? null,
+        isActive: dto.isActive ?? true,
+      },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+      },
+    });
+  }
+
+  private async appendHeroImages(
+    heroId: number,
+    files: Express.Multer.File[],
+  ): Promise<void> {
+    const maxSort = await this.prisma.heroImage.aggregate({
+      where: { heroId },
+      _max: { sortOrder: true },
+    });
+    let nextSort = (maxSort._max.sortOrder ?? -1) + 1;
+
+    for (const file of files) {
+      const imagePath = await this.storage.saveImage('hero', file);
+      await this.prisma.heroImage.create({
+        data: {
+          heroId,
+          imagePath,
+          sortOrder: nextSort,
+        },
+      });
+      nextSort += 1;
+    }
+  }
+
+  private async deleteHeroImagesByIds(
+    heroId: number,
+    ids: number[],
+  ): Promise<void> {
+    const images = await this.prisma.heroImage.findMany({
+      where: { heroId, id: { in: ids } },
+    });
+    if (images.length === 0) {
+      return;
+    }
+
+    await this.prisma.heroImage.deleteMany({
+      where: { heroId, id: { in: images.map((image) => image.id) } },
+    });
+
+    await Promise.all(
+      images.map((image) => this.storage.deleteByPublicPath(image.imagePath)),
+    );
+  }
+
+  private async applyImageOrder(
+    heroId: number,
+    orderedIds: number[],
+  ): Promise<void> {
+    const existing = await this.prisma.heroImage.findMany({
+      where: { heroId },
+      select: { id: true },
+    });
+    const existingIds = new Set(existing.map((image) => image.id));
+    const uniqueOrdered = orderedIds.filter(
+      (id, index) => orderedIds.indexOf(id) === index && existingIds.has(id),
+    );
+
+    if (uniqueOrdered.length !== existingIds.size) {
+      throw new BadRequestException(
+        'imageOrder must include every current hero background image exactly once.',
+      );
+    }
+
+    await this.prisma.$transaction(
+      uniqueOrdered.map((id, index) =>
+        this.prisma.heroImage.update({
+          where: { id },
+          data: { sortOrder: index },
+        }),
+      ),
+    );
+  }
+
+  private serializeHero(hero: HeroWithImages): HeroContentDto {
     return {
       id: hero.id,
       eyebrow: hero.eyebrow,
@@ -142,8 +307,18 @@ export class ContentService {
       secondaryButtonText: hero.secondaryButtonText,
       secondaryButtonLink: hero.secondaryButtonLink,
       isActive: hero.isActive,
+      images: hero.images.map((image) => this.serializeHeroImage(image)),
       createdAt: hero.createdAt.toISOString(),
       updatedAt: hero.updatedAt.toISOString(),
+    };
+  }
+
+  private serializeHeroImage(image: HeroImage): HeroImageDto {
+    return {
+      id: image.id,
+      imagePath: image.imagePath,
+      sortOrder: image.sortOrder,
+      createdAt: image.createdAt.toISOString(),
     };
   }
 

@@ -161,10 +161,38 @@ export const api = createApi({
       query: () => "/content/hero",
       providesTags: ["Hero"],
     }),
-    updateHero: builder.mutation<HeroContentDto, Record<string, unknown>>({
+    updateHero: builder.mutation<
+      HeroContentDto,
+      FormData | Record<string, unknown>
+    >({
       query: (body) => ({ url: "/admin/content/hero", method: "PATCH", body }),
       invalidatesTags: ["Hero"],
     }),
+    uploadHeroImages: builder.mutation<HeroContentDto, FormData>({
+      query: (body) => ({
+        url: "/admin/content/hero/images",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Hero"],
+    }),
+    deleteHeroImage: builder.mutation<HeroContentDto, number>({
+      query: (id) => ({
+        url: `/admin/content/hero/images/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Hero"],
+    }),
+    reorderHeroImages: builder.mutation<HeroContentDto, { orderedIds: number[] }>(
+      {
+        query: (body) => ({
+          url: "/admin/content/hero/images/reorder",
+          method: "PATCH",
+          body,
+        }),
+        invalidatesTags: ["Hero"],
+      },
+    ),
 
     getCeo: builder.query<CeoMessageDto | null, void>({
       query: () => "/content/ceo",
@@ -205,6 +233,9 @@ export const {
   useDeleteProductMutation,
   useGetHeroQuery,
   useUpdateHeroMutation,
+  useUploadHeroImagesMutation,
+  useDeleteHeroImageMutation,
+  useReorderHeroImagesMutation,
   useGetCeoQuery,
   useUpdateCeoMutation,
   useGetSiteSettingsQuery,

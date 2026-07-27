@@ -6,6 +6,7 @@ export type {
 } from "./product";
 export type {
   HeroContentDto,
+  HeroImageDto,
   CeoMessageDto,
   SiteSettingsDto,
 } from "./content";

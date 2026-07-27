@@ -1,15 +1,10 @@
 import Link from "next/link";
-import type { HeroContentDto, ProductDto } from "@alsayed/shared-types";
+import type { HeroContentDto } from "@alsayed/shared-types";
 import { ArrowRight, LeafIcon } from "@/components/brand/icons";
-import { ProductImage } from "@/components/ui/product-image";
+import { resolveImageUrl } from "@/lib/config";
+import { HeroBackgroundSlider } from "./hero-background-slider";
 
-export function Hero({
-  hero,
-  products,
-}: {
-  hero: HeroContentDto | null;
-  products: ProductDto[];
-}) {
+export function Hero({ hero }: { hero: HeroContentDto | null }) {
   const eyebrow = hero?.eyebrow ?? "Purpose-driven beverages";
   const title = hero?.title ?? "Every sip";
   const highlight = hero?.highlightedText ?? "carries meaning.";
@@ -21,78 +16,49 @@ export function Hero({
   const secondaryText = hero?.secondaryButtonText ?? "View Categories";
   const secondaryLink = hero?.secondaryButtonLink ?? "/#categories";
 
-  const lineup = products.slice(0, 6);
+  const backgroundImages = (hero?.images ?? [])
+    .map((image) => {
+      const src = resolveImageUrl(image.imagePath);
+      if (!src) return null;
+      return { id: image.id, src };
+    })
+    .filter((image): image is { id: number; src: string } => image !== null);
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Soft landscape wash at the base of the hero */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-brand-100/70 via-brand-50/40 to-transparent"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"
-      />
+    <section className="relative isolate min-h-[70svh] overflow-hidden text-white sm:min-h-[75vh] md:min-h-[85vh] lg:min-h-[90vh]">
+      <HeroBackgroundSlider images={backgroundImages} />
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-5 pb-4 pt-10 md:pt-16 lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-8 lg:pb-10">
-        <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">
+      <div className="relative z-10 mx-auto flex min-h-[70svh] max-w-7xl flex-col justify-center px-5 py-12 sm:min-h-[75vh] sm:py-14 md:min-h-[85vh] md:px-8 md:py-20 lg:min-h-[90vh]">
+        <div className="animate-fade-up mx-auto w-full max-w-2xl text-center lg:mx-0 lg:text-left">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
             <LeafIcon className="h-3.5 w-3.5" />
             {eyebrow}
           </span>
 
-          <h1 className="mt-5 font-serif text-5xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
             {title}
             <br />
-            <span className="text-brand-600">{highlight}</span>
+            <span className="text-brand-200">{highlight}</span>
           </h1>
 
-          <p className="mt-5 max-w-md text-base leading-relaxed text-ink-soft sm:text-lg">
+          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/85 sm:text-lg lg:mx-0">
             {description}
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
             <Link
               href={primaryLink}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-400"
             >
               {primaryText}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href={secondaryLink}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/15 bg-white px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300 hover:text-brand-700"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
             >
               {secondaryText}
             </Link>
-          </div>
-        </div>
-
-        {/* Product lineup */}
-        <div className="animate-fade-up">
-          <div className="relative">
-            <div className="flex items-end justify-center gap-1.5 sm:gap-3">
-              {lineup.map((product, i) => (
-                <ProductImage
-                  key={product.id}
-                  imagePath={product.imagePath}
-                  alt={product.title}
-                  seed={i}
-                  className="flex h-40 items-end sm:h-56 lg:h-72"
-                  imgClassName={
-                    i % 2 === 0
-                      ? "drop-shadow-xl"
-                      : "translate-y-1 drop-shadow-xl"
-                  }
-                />
-              ))}
-            </div>
-            {/* Ice / reflection base */}
-            <div
-              aria-hidden="true"
-              className="mx-auto mt-[-8px] h-6 w-[92%] rounded-full bg-gradient-to-r from-transparent via-brand-200/60 to-transparent blur-md"
-            />
           </div>
         </div>
       </div>
