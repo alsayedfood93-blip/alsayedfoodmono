@@ -42,8 +42,8 @@ export default async function ProductsPage({
       </div>
 
       {products.length === 0 ? (
-        <div className="mt-16 rounded-2xl border border-dashed border-ink/15 bg-white p-12 text-center">
-          <p className="font-serif text-xl text-ink">No products found</p>
+        <div className="mt-16 rounded-card border border-dashed border-border bg-card p-12 text-center shadow-premium">
+          <p className="font-serif text-xl font-bold text-ink">No products found</p>
           <p className="mt-2 text-sm text-muted">
             Try a different category or check back soon.
           </p>
@@ -71,10 +71,10 @@ function FilterChip({
   return (
     <Link
       href={href}
-      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+      className={`rounded-badge border px-4 py-2 text-sm font-medium transition-all duration-300 ${
         active
-          ? "border-brand-600 bg-brand-600 text-white"
-          : "border-ink/15 bg-white text-ink-soft hover:border-brand-300 hover:text-brand-700"
+          ? "border-primary bg-primary text-white shadow-premium"
+          : "border-border bg-card text-ink-soft hover:border-mint hover:bg-soft hover:text-primary"
       }`}
     >
       {label}

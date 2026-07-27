@@ -28,7 +28,7 @@ export function Logo() {
         <span className="block font-serif text-xl font-bold tracking-tight text-ink">
           ALSAYED
         </span>
-        <span className="block text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-brand-600">
+        <span className="block text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-primary">
           Food &amp; Beverages
         </span>
       </span>

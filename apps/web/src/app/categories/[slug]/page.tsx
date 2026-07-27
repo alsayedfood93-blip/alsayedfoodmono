@@ -40,11 +40,11 @@ export default async function CategoryPage({
   return (
     <main className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-16">
       <nav className="flex items-center gap-1.5 text-sm text-muted">
-        <Link href="/" className="hover:text-brand-600">
+        <Link href="/" className="hover:text-primary">
           Home
         </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-brand-600">
+        <Link href="/products" className="hover:text-primary">
           Products
         </Link>
         <span>/</span>
@@ -53,7 +53,7 @@ export default async function CategoryPage({
 
       <div className="mt-6">
         <Eyebrow>Category</Eyebrow>
-        <h1 className="mt-3 font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl">
+        <h1 className="mt-3 font-serif text-4xl font-bold leading-tight text-ink sm:text-5xl">
           {category.title}
         </h1>
         {category.description && (
@@ -64,8 +64,8 @@ export default async function CategoryPage({
       </div>
 
       {products.length === 0 ? (
-        <div className="mt-16 rounded-2xl border border-dashed border-ink/15 bg-white p-12 text-center">
-          <p className="font-serif text-xl text-ink">
+        <div className="mt-16 rounded-card border border-dashed border-border bg-card p-12 text-center shadow-premium">
+          <p className="font-serif text-xl font-bold text-ink">
             No products in this category yet
           </p>
           <p className="mt-2 text-sm text-muted">Please check back soon.</p>

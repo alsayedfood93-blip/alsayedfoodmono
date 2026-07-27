@@ -10,18 +10,18 @@ export function ContactCta({ settings }: { settings: SiteSettingsDto | null }) {
   const tel = telLink(settings?.phone);
 
   return (
-    <section id="contact" className="scroll-mt-24 border-t border-ink/10 bg-white">
+    <section id="contact" className="scroll-mt-24 border-t border-border bg-soft">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
-        <div className="relative overflow-hidden rounded-3xl bg-brand-700 px-6 py-12 text-center md:px-12 md:py-16">
+        <div className="relative overflow-hidden rounded-card bg-primary-dark px-6 py-12 text-center shadow-premium md:px-12 md:py-16">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-brand-500/40 blur-3xl"
+            className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-mint/30 blur-3xl"
           />
           <div className="relative">
-            <h2 className="font-serif text-3xl font-semibold text-white sm:text-4xl">
+            <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
               Let&apos;s bring ALSAYED to you
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-brand-100">
+            <p className="mx-auto mt-4 max-w-lg text-water">
               Reach out for orders, partnerships or wholesale enquiries. Our team
               is ready to help.
             </p>
@@ -31,7 +31,7 @@ export function ContactCta({ settings }: { settings: SiteSettingsDto | null }) {
                   href={wa}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-brand-700 transition-transform hover:scale-[1.02]"
+                  className="inline-flex items-center justify-center gap-2 rounded-button bg-card px-6 py-3.5 text-sm font-semibold text-primary transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-premium-hover"
                 >
                   <WhatsAppIcon className="h-5 w-5" />
                   Chat on WhatsApp
@@ -40,7 +40,7 @@ export function ContactCta({ settings }: { settings: SiteSettingsDto | null }) {
               {tel && (
                 <a
                   href={tel}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                  className="inline-flex items-center justify-center gap-2 rounded-button border border-water/35 px-6 py-3.5 text-sm font-semibold text-water transition-colors duration-300 hover:bg-water/10"
                 >
                   <PhoneIcon className="h-5 w-5" />
                   {settings?.phone}
@@ -49,7 +49,7 @@ export function ContactCta({ settings }: { settings: SiteSettingsDto | null }) {
               {settings?.email && (
                 <a
                   href={`mailto:${settings.email}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                  className="inline-flex items-center justify-center gap-2 rounded-button border border-water/35 px-6 py-3.5 text-sm font-semibold text-water transition-colors duration-300 hover:bg-water/10"
                 >
                   <MailIcon className="h-5 w-5" />
                   Email us

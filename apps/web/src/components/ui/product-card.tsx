@@ -12,11 +12,11 @@ export function ProductCard({
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_16px_40px_-24px_rgba(19,32,26,0.4)]"
+      className="group flex h-full flex-col overflow-hidden rounded-card border border-border bg-card shadow-premium transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-mint/40 hover:shadow-premium-hover"
     >
-      <div className="relative flex items-center justify-center bg-gradient-to-b from-brand-50 to-white p-6">
+      <div className="relative flex items-center justify-center bg-gradient-to-b from-soft to-card p-6">
         {product.isFeatured && (
-          <span className="absolute left-3 top-3 rounded-full bg-brand-600 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wide text-white">
+          <span className="absolute left-3 top-3 rounded-badge border border-white/30 bg-white/70 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wide text-primary backdrop-blur-md">
             Featured
           </span>
         )}
@@ -29,11 +29,11 @@ export function ProductCard({
       </div>
       <div className="flex flex-1 flex-col p-5">
         {product.category && (
-          <span className="text-xs font-medium uppercase tracking-wide text-brand-600">
+          <span className="text-xs font-medium uppercase tracking-wide text-primary">
             {product.category.title}
           </span>
         )}
-        <h3 className="mt-1 font-serif text-lg font-semibold text-ink">
+        <h3 className="mt-1 font-serif text-lg font-bold text-ink">
           {product.title}
         </h3>
         {product.size && (

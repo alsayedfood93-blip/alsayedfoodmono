@@ -9,7 +9,7 @@ export function FeaturedProducts({ products }: { products: ProductDto[] }) {
     return null;
   }
   return (
-    <section id="featured" className="scroll-mt-24 border-t border-ink/10 bg-white">
+    <section id="featured" className="scroll-mt-24 border-t border-border bg-soft">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -18,7 +18,7 @@ export function FeaturedProducts({ products }: { products: ProductDto[] }) {
           </div>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors duration-300 hover:text-primary-dark"
           >
             View all products
             <ArrowRight className="h-4 w-4" />

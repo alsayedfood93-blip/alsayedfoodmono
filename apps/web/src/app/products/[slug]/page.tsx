@@ -43,11 +43,11 @@ export default async function ProductDetailPage({
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-16">
       <nav className="flex items-center gap-1.5 text-sm text-muted">
-        <Link href="/" className="hover:text-brand-600">
+        <Link href="/" className="hover:text-primary">
           Home
         </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-brand-600">
+        <Link href="/products" className="hover:text-primary">
           Products
         </Link>
         <span>/</span>
@@ -55,7 +55,7 @@ export default async function ProductDetailPage({
       </nav>
 
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="flex items-center justify-center rounded-3xl border border-ink/10 bg-gradient-to-b from-brand-50 to-white p-10">
+        <div className="flex items-center justify-center rounded-card border border-border bg-gradient-to-b from-soft to-card p-10 shadow-premium">
           <ProductImage
             imagePath={product.imagePath}
             alt={product.title}
@@ -68,12 +68,12 @@ export default async function ProductDetailPage({
           {product.category && (
             <Link
               href={`/categories/${product.category.slug}`}
-              className="text-sm font-semibold uppercase tracking-wide text-brand-600"
+              className="text-sm font-semibold uppercase tracking-wide text-primary"
             >
               {product.category.title}
             </Link>
           )}
-          <h1 className="mt-2 font-serif text-4xl font-semibold leading-tight text-ink">
+          <h1 className="mt-2 font-serif text-4xl font-bold leading-tight text-ink">
             {product.title}
           </h1>
           {product.size && (
@@ -94,7 +94,7 @@ export default async function ProductDetailPage({
                 {product.ingredients.map((ingredient) => (
                   <span
                     key={ingredient}
-                    className="rounded-full border border-ink/10 bg-white px-3 py-1 text-sm text-ink-soft"
+                    className="rounded-badge border border-border bg-card px-3 py-1 text-sm text-ink-soft"
                   >
                     {ingredient}
                   </span>
@@ -106,14 +106,14 @@ export default async function ProductDetailPage({
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/#contact"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+              className="btn-primary px-6 py-3.5"
             >
               <WhatsAppIcon className="h-5 w-5" />
               Enquire to Order
             </Link>
             <Link
               href="/products"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/15 bg-white px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300"
+              className="btn-secondary px-6 py-3.5"
             >
               Back to Products
               <ArrowRight className="h-4 w-4" />

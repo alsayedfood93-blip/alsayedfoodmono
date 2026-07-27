@@ -10,7 +10,7 @@ export function CategoriesSection({
   categories: CategoryDto[];
 }) {
   return (
-    <section id="categories" className="scroll-mt-24 bg-cream">
+    <section id="categories" className="scroll-mt-24 bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -22,7 +22,7 @@ export function CategoriesSection({
           </div>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors duration-300 hover:text-primary-dark"
           >
             View all categories
             <ArrowRight className="h-4 w-4" />

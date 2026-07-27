@@ -30,32 +30,32 @@ export function Hero({ hero }: { hero: HeroContentDto | null }) {
 
       <div className="relative z-10 mx-auto flex min-h-[70svh] max-w-7xl flex-col justify-center px-5 py-12 sm:min-h-[75vh] sm:py-14 md:min-h-[85vh] md:px-8 md:py-20 lg:min-h-[90vh]">
         <div className="animate-fade-up mx-auto w-full max-w-2xl text-center lg:mx-0 lg:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
+          <span className="inline-flex items-center gap-2 rounded-badge border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
             <LeafIcon className="h-3.5 w-3.5" />
             {eyebrow}
           </span>
 
-          <h1 className="mt-5 font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="mt-5 font-serif text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
             {title}
             <br />
-            <span className="text-brand-200">{highlight}</span>
+            <span className="text-mint">{highlight}</span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/85 sm:text-lg lg:mx-0">
+          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-water sm:text-lg lg:mx-0">
             {description}
           </p>
 
           <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
             <Link
               href={primaryLink}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-400"
+              className="btn-primary px-6 py-3.5"
             >
               {primaryText}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href={secondaryLink}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              className="inline-flex items-center justify-center gap-2 rounded-button border border-white/35 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20"
             >
               {secondaryText}
             </Link>

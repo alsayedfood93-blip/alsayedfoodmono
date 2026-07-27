@@ -30,15 +30,15 @@ const ITEMS = [
 
 export function TrustStrip() {
   return (
-    <section className="border-y border-ink/10 bg-white">
+    <section className="border-y border-border bg-card">
       <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8 lg:py-8">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 md:divide-x md:divide-ink/10">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 md:divide-x md:divide-border">
           {ITEMS.map(({ icon: Icon, title, subtitle }) => (
             <div
               key={title}
               className="flex items-start gap-3 md:justify-center md:px-4"
             >
-              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-100 text-brand-600">
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-button bg-water text-primary transition-colors duration-300 hover:text-mint">
                 <Icon className="h-5 w-5" />
               </span>
               <div className="min-w-0">

@@ -21,7 +21,7 @@ const VALUES = [
 
 export function WhoWeAre() {
   return (
-    <section id="who-we-are" className="scroll-mt-24 bg-cream">
+    <section id="who-we-are" className="scroll-mt-24 bg-background">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-5 py-16 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
         <div>
           <Eyebrow>Who We Are</Eyebrow>
@@ -39,13 +39,13 @@ export function WhoWeAre() {
           {VALUES.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="flex items-start gap-4 rounded-2xl border border-ink/10 bg-white p-5"
+              className="flex items-start gap-4 rounded-card border border-border bg-card p-5 shadow-premium transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-hover"
             >
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-100 text-brand-600">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-button bg-water text-primary transition-colors duration-300 hover:text-mint">
                 <Icon className="h-5 w-5" />
               </span>
               <div>
-                <h3 className="font-serif text-lg font-semibold text-ink">
+                <h3 className="font-serif text-lg font-bold text-ink">
                   {title}
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-ink-soft">
