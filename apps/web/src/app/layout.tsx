@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
+import { GlassBackground } from "@/components/background";
 import { getCategories, getSiteSettings } from "@/lib/api";
 import { whatsappLink } from "@/lib/whatsapp";
 
@@ -55,9 +56,11 @@ export default async function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-ink">
-        <Navbar orderLink={orderLink} />
-        <div className="flex-1">{children}</div>
-        <Footer settings={settings} categories={categories} />
+        <GlassBackground className="flex min-h-full flex-1 flex-col">
+          <Navbar orderLink={orderLink} />
+          <div className="flex-1">{children}</div>
+          <Footer settings={settings} categories={categories} />
+        </GlassBackground>
       </body>
     </html>
   );

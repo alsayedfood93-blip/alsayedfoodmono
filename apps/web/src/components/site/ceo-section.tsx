@@ -2,6 +2,7 @@ import type { CeoMessageDto } from "@alsayed/shared-types";
 import { resolveImageUrl } from "@/lib/config";
 import { Eyebrow } from "@/components/ui/section-heading";
 import { GlobeIcon, HeartIcon, ShieldIcon } from "@/components/brand/icons";
+import { GlassSection } from "@/components/background";
 
 const VALUES = [
   {
@@ -28,66 +29,64 @@ export function CeoSection({ ceo }: { ceo: CeoMessageDto | null }) {
   const imageUrl = resolveImageUrl(ceo.imagePath);
 
   return (
-    <section id="our-story" className="scroll-mt-24 border-t border-border bg-soft">
-      <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-        <div className="overflow-hidden rounded-card border border-border bg-card shadow-premium">
-          <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-[280px_1fr] md:gap-10 md:p-10 lg:grid-cols-[300px_1fr_260px]">
-            {/* Photo */}
-            <div className="mx-auto w-40 md:mx-0 md:w-full">
-              <div className="aspect-square overflow-hidden rounded-image bg-water">
-                {imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={imageUrl}
-                    alt={ceo.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <span className="font-serif text-5xl font-bold text-primary">
-                      {ceo.name.charAt(0)}
-                    </span>
-                  </div>
-                )}
+    <GlassSection
+      id="our-story"
+      tone="frost"
+      blend="both"
+      innerClassName="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24"
+      panelClassName="overflow-hidden"
+    >
+      <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-[280px_1fr] md:gap-10 md:p-10 lg:grid-cols-[300px_1fr_260px]">
+        {/* Photo */}
+        <div className="mx-auto w-40 md:mx-0 md:w-full">
+          <div className="aspect-square overflow-hidden rounded-image border border-white/50 bg-water/70 shadow-[0_12px_30px_rgba(120,180,220,0.12)]">
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={ceo.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <span className="font-serif text-5xl font-bold text-primary">
+                  {ceo.name.charAt(0)}
+                </span>
               </div>
-            </div>
-
-            {/* Message */}
-            <div className="flex flex-col justify-center">
-              <Eyebrow>From Our CEO</Eyebrow>
-              <h2 className="mt-3 font-serif text-2xl font-bold text-ink sm:text-3xl">
-                A Message from Our Founder
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-ink-soft">
-                {ceo.description}
-              </p>
-              <div className="mt-6">
-                <p className="font-serif text-lg font-bold text-ink">
-                  {ceo.name}
-                </p>
-                <p className="text-sm text-muted">{ceo.title}</p>
-              </div>
-            </div>
-
-            {/* Values */}
-            <div className="flex flex-col justify-center gap-5 border-t border-border pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-              {VALUES.map(({ icon: Icon, title, text }) => (
-                <div key={title} className="flex items-start gap-3">
-                  <span className="flex h-9 w-9 flex-none items-center justify-center rounded-button bg-water text-primary transition-colors duration-300 hover:text-mint">
-                    <Icon className="h-4.5 w-4.5" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-ink">{title}</p>
-                    <p className="mt-0.5 text-xs leading-snug text-muted">
-                      {text}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Message */}
+        <div className="flex flex-col justify-center">
+          <Eyebrow>From Our CEO</Eyebrow>
+          <h2 className="mt-3 font-serif text-2xl font-bold text-ink sm:text-3xl">
+            A Message from Our Founder
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-ink-soft">
+            {ceo.description}
+          </p>
+          <div className="mt-6">
+            <p className="font-serif text-lg font-bold text-ink">{ceo.name}</p>
+            <p className="text-sm text-muted">{ceo.title}</p>
+          </div>
+        </div>
+
+        {/* Values */}
+        <div className="flex flex-col justify-center gap-5 border-t border-white/40 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+          {VALUES.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="flex items-start gap-3">
+              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-button border border-white/50 bg-white/55 text-primary transition-colors duration-300 hover:text-mint">
+                <Icon className="h-4.5 w-4.5" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-ink">{title}</p>
+                <p className="mt-0.5 text-xs leading-snug text-muted">{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </section>
+    </GlassSection>
   );
 }

@@ -4,6 +4,7 @@ import { ArrowRight } from "@/components/brand/icons";
 import { Eyebrow, SectionHeading } from "@/components/ui/section-heading";
 import { ProductCard } from "@/components/ui/product-card";
 import { ProductImage } from "@/components/ui/product-image";
+import { GlassSection } from "@/components/background";
 
 export function FeaturedProducts({ products }: { products: ProductDto[] }) {
   if (products.length === 0) {
@@ -12,53 +13,53 @@ export function FeaturedProducts({ products }: { products: ProductDto[] }) {
   const visibleProducts = products.slice(0, 4);
 
   return (
-    <section
+    <GlassSection
       id="featured"
-      className="scroll-mt-24 border-b border-primary/10 bg-background"
+      tone="clear"
+      blend="both"
+      panelClassName="px-5 py-8 md:px-8 md:py-10"
     >
-      <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8 lg:py-18">
-        <div className="flex flex-wrap items-end justify-between gap-5">
-          <div>
-            <Eyebrow>Our Signature Drinks</Eyebrow>
-            <SectionHeading className="mt-2 text-3xl sm:text-4xl">
-              Handpicked for You
-            </SectionHeading>
-          </div>
-          <Link
-            href="/products"
-            className="group inline-flex items-center gap-2 pb-1 text-sm font-semibold text-primary transition-colors duration-300 hover:text-primary-dark"
-          >
-            View all products
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <Eyebrow>Our Signature Drinks</Eyebrow>
+          <SectionHeading className="mt-2 text-3xl sm:text-4xl">
+            Handpicked for You
+          </SectionHeading>
         </div>
+        <Link
+          href="/products"
+          className="group inline-flex items-center gap-2 pb-1 text-sm font-semibold text-primary transition-colors duration-300 hover:text-primary-dark"
+        >
+          View all products
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
+      </div>
 
-        <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar sm:hidden">
-          {visibleProducts.map((product, i) => (
-            <div
-              key={product.id}
-              className="w-[78vw] max-w-[275px] flex-none snap-start"
-            >
-              <ProductCard product={product} seed={i} featuredLayout />
-            </div>
-          ))}
-          <div className="w-[78vw] max-w-[275px] flex-none snap-start">
-            <ExploreAllCard />
+      <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-2 no-scrollbar sm:hidden">
+        {visibleProducts.map((product, i) => (
+          <div
+            key={product.id}
+            className="w-[78vw] max-w-[275px] flex-none snap-start"
+          >
+            <ProductCard product={product} seed={i} featuredLayout />
           </div>
-        </div>
-        <div className="mt-8 hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {visibleProducts.map((product, i) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              seed={i}
-              featuredLayout
-            />
-          ))}
+        ))}
+        <div className="w-[78vw] max-w-[275px] flex-none snap-start">
           <ExploreAllCard />
         </div>
       </div>
-    </section>
+      <div className="mt-8 hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {visibleProducts.map((product, i) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            seed={i}
+            featuredLayout
+          />
+        ))}
+        <ExploreAllCard />
+      </div>
+    </GlassSection>
   );
 }
 
